@@ -23,40 +23,39 @@ A linguagem foi construída com suporte para:
 ## 🧩 EBNF da Linguagem
 
 ```ebnf
-programa = { comando } ;
+programa       ::= { comando } ;
 
-comando = adicionar 
-        | misturar
-        | assar
-        | servir
-        | condicional
-        | loop ;
+comando        ::= atribuicao
+                 | condicional
+                 | loop
+                 | acao ;
 
-adicionar = "adicione" ingrediente quantidade ;
-misturar  = "misture até" condicao ;
-assar     = "asse" prato ;
-servir    = "sirva" prato ;
+atribuicao     ::= identificador "=" expressao ";" ;
 
-condicional = "se" condicao "então" acao ;
-loop         = "enquanto" condicao "faça" acao ;
+expressao      ::= termo { ("+" | "-") termo } ;
 
-acao = misturar | assar | servir ;
+termo          ::= fator { ("*" | "/") fator } ;
 
-ingrediente = palavra ;
-prato = palavra ;
-quantidade = número ;
+fator          ::= número
+                 | identificador
+                 | "(" expressao ")" ;
 
-condicao = "forno quente" 
-         | "massa uniforme"
-         | "massa líquida"
-         | "forno desligado"
-         | "prato pronto" ;
+condicional    ::= "se" "(" expressao op_comp expressao ")" "entao" comando ;
 
-palavra = letra , { letra } ;
-letra = "a" | "b" | "c" | ... | "z" | "A" | "B" | "C" | ... | "Z" ;
+loop           ::= "enquanto" "(" expressao op_comp expressao ")" "faca" comando ;
 
-número = dígito , { dígito } ;
-dígito = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+op_comp        ::= "==" | "!=" | "<" | "<=" | ">" | ">=" ;
+
+acao           ::= "adicione" ingrediente quantidade ";"
+                 | "misture_ate" condicao_predefinida ";"
+                 | "asse" prato ";"
+                 | "sirva" prato ";" ;
+
+identificador  ::= letra { letra | dígito | "_" } ;
+número         ::= dígito { dígito } ;
+letra          ::= "A"… "Z" | "a"… "z" ;
+dígito         ::= "0"… "9" ;
+
 ```
 
 ## 🥣 Exemplos de Comandos
@@ -95,3 +94,50 @@ misture até massa uniforme
 se forno quente então asse bolo
 enquanto massa líquida faça misture até massa uniforme
 sirva bolo
+```
+
+---
+
+## 🚦 Como executar o conjunto de testes
+
+1. **Compile o interpretador**  
+   ```bash
+   bison -d cooklang.y
+   flex  cooklang.l
+   gcc -o cooklang lex.yy.c cooklang.tab.c ast.c symtab.c -lfl
+
+2. **Acesse a pasta de testes**
+
+    ```bash
+    cd tests
+    ```
+
+3. **Execute todos os casos**
+
+    ```bash
+    ./run_tests.sh
+    ```
+    Você deverá ver:
+
+    ```text
+    === Test actions.cook ===
+    ✔ OK
+
+    === Test arithmetic.cook ===
+    ✔ OK
+
+    === Test ifwhile.cook ===
+    ✔ OK
+    ```
+
+4. **Valores das variáveis**
+
+    Ao final da execução, o interpretador imprime todas as variáveis atribuídas.
+
+---
+
+## 📎 Apresentação
+
+Confira os slides da apresentação do CookLang no Google Slides:  
+
+[🔗 Acessar apresentação online](https://docs.google.com/presentation/d/1JdDOKujHEpy-L0jdXjVhxT-QdJGOacbcfXVdRf0dmBA/edit?usp=sharing)
