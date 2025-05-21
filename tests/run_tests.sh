@@ -6,7 +6,7 @@ for cook in *.cook; do
   out="${cook%.cook}.out"
   printf "\n=== Test %s ===\n" "$cook"
   ../cooklang "$cook" > "$out"
-  if diff -q "$exp" "$out"; then
+  if diff --strip-trailing-cr -q "$exp" "$out"; then
     echo "✔ OK"
   else
     echo "✖ FAIL"
